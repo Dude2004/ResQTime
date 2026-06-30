@@ -1,0 +1,134 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account registration and custom metadata",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email address of the user"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Name displayed in the application UI"
+        },
+        "createdAt": {
+          "type": "integer",
+          "description": "Timestamp when the user was registered"
+        },
+        "authProvider": {
+          "type": "string",
+          "description": "Method of authentication (e.g. password, otp, guest)"
+        },
+        "isEvaluator": {
+          "type": "boolean",
+          "description": "Whether user is a judge or evaluator"
+        }
+      },
+      "required": ["email", "displayName", "createdAt"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "An individual assignment with actionable steps, priority, and deadline",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique task ID"
+        },
+        "task_name": {
+          "type": "string",
+          "description": "Descriptive task title"
+        },
+        "deadline": {
+          "type": "string",
+          "description": "Absolute target date/time"
+        },
+        "estimated_duration_minutes": {
+          "type": "integer",
+          "description": "Total expected minutes"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["Critical", "Medium", "Low"]
+        },
+        "category": {
+          "type": "string",
+          "enum": ["Academic", "Work", "Personal", "Financial", "Other"]
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "micro_steps": {
+          "type": "array"
+        },
+        "reality_check": {
+          "type": "object"
+        },
+        "verification_image": {
+          "type": "string"
+        },
+        "xp_awarded": {
+          "type": "integer"
+        }
+      },
+      "required": ["id", "task_name", "deadline", "estimated_duration_minutes", "priority", "category", "completed"]
+    },
+    "Stats": {
+      "title": "User Statistics",
+      "description": "Gamification parameters such as score points and daily streak info",
+      "type": "object",
+      "properties": {
+        "total_xp": {
+          "type": "integer"
+        },
+        "completed_tasks_count": {
+          "type": "integer"
+        },
+        "critical_tasks_resolved": {
+          "type": "integer"
+        },
+        "streak_days": {
+          "type": "integer"
+        }
+      },
+      "required": ["total_xp", "completed_tasks_count", "critical_tasks_resolved", "streak_days"]
+    },
+    "Otp": {
+      "title": "One-Time Passcode",
+      "description": "Frictionless authentication OTP code generator",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "integer"
+        }
+      },
+      "required": ["email", "code", "expiresAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Root user profile document"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Tasks subcollection nested under the user document"
+    },
+    "/users/{userId}/stats/{statId}": {
+      "schema": "Stats",
+      "description": "Gamified stats document for the user"
+    },
+    "/otps/{email}": {
+      "schema": "Otp",
+      "description": "Temporary OTP verification documents"
+    }
+  }
+}

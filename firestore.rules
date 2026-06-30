@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Match rules for user data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Tasks subcollection
+      match /tasks/{taskId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Stats subcollection/document
+      match /stats/{statId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Temporary OTP code access (must be open for unauthenticated users during login/OTP phase)
+    match /otps/{email} {
+      allow get, create, update: if true;
+      allow delete, list: if false;
+    }
+  }
+}

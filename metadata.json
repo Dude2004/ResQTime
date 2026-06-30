@@ -1,0 +1,6 @@
+{
+  "name": "ResQTime",
+  "description": "A mindful and calming productivity sanctuary that gently parses chaos, organizes study tasks, simulates stress-free compromises, and guides students back into focus with soothing breathing techniques.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
