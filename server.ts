@@ -82,52 +82,59 @@ function saveOtps(otps: any[]) {
 function loadTasks(userId: string) {
   const filePath = getTasksFilePath(userId);
   if (!fs.existsSync(filePath)) {
-    // Generate fresh tasks based on the current year (2026 as per metadata)
-    const initialTasks = [
-      {
-        id: "task-1",
-        task_name: "Submit CS201 Final Java Project & Documentation",
-        deadline: "2026-06-29 18:00:00",
-        estimated_duration_minutes: 180,
-        priority: "Critical",
-        category: "Academic",
-        completed: false,
-        micro_steps: [
-          { step_number: 1, actionable_instruction: "Open IDE and review final requirements checklist", duration_minutes: 15 },
-          { step_number: 2, actionable_instruction: "Write the core routing class and error boundary", duration_minutes: 45 },
-          { step_number: 3, actionable_instruction: "Test sample payloads and compile code", duration_minutes: 30 }
-        ]
-      },
-      {
-        id: "task-2",
-        task_name: "Prepare Slide Deck for Q3 Budget Proposal",
-        deadline: "2026-06-30 09:30:00",
-        estimated_duration_minutes: 120,
-        priority: "Critical",
-        category: "Work",
-        completed: false
-      },
-      {
-        id: "task-3",
-        task_name: "Pay Monthly Electric and Internet Bills",
-        deadline: "2026-07-01 12:00:00",
-        estimated_duration_minutes: 15,
-        priority: "Medium",
-        category: "Financial",
-        completed: false
-      },
-      {
-        id: "task-4",
-        task_name: "Go to dentist for annual cleaning",
-        deadline: "2026-07-02 14:00:00",
-        estimated_duration_minutes: 90,
-        priority: "Low",
-        category: "Personal",
-        completed: false
-      }
-    ];
-    fs.writeFileSync(filePath, JSON.stringify(initialTasks, null, 2));
-    return initialTasks;
+    const isGuest = userId.includes("guest");
+    if (isGuest) {
+      // Generate fresh tasks based on the current year (2026 as per metadata)
+      const initialTasks = [
+        {
+          id: "task-1",
+          task_name: "Submit CS201 Final Java Project & Documentation",
+          deadline: "2026-06-29 18:00:00",
+          estimated_duration_minutes: 180,
+          priority: "Critical",
+          category: "Academic",
+          completed: false,
+          micro_steps: [
+            { step_number: 1, actionable_instruction: "Open IDE and review final requirements checklist", duration_minutes: 15 },
+            { step_number: 2, actionable_instruction: "Write the core routing class and error boundary", duration_minutes: 45 },
+            { step_number: 3, actionable_instruction: "Test sample payloads and compile code", duration_minutes: 30 }
+          ]
+        },
+        {
+          id: "task-2",
+          task_name: "Prepare Slide Deck for Q3 Budget Proposal",
+          deadline: "2026-06-30 09:30:00",
+          estimated_duration_minutes: 120,
+          priority: "Critical",
+          category: "Work",
+          completed: false
+        },
+        {
+          id: "task-3",
+          task_name: "Pay Monthly Electric and Internet Bills",
+          deadline: "2026-07-01 12:00:00",
+          estimated_duration_minutes: 15,
+          priority: "Medium",
+          category: "Financial",
+          completed: false
+        },
+        {
+          id: "task-4",
+          task_name: "Go to dentist for annual cleaning",
+          deadline: "2026-07-02 14:00:00",
+          estimated_duration_minutes: 90,
+          priority: "Low",
+          category: "Personal",
+          completed: false
+        }
+      ];
+      fs.writeFileSync(filePath, JSON.stringify(initialTasks, null, 2));
+      return initialTasks;
+    } else {
+      // Standard users start with a clean slate
+      fs.writeFileSync(filePath, JSON.stringify([], null, 2));
+      return [];
+    }
   }
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
@@ -146,12 +153,18 @@ function saveTasks(userId: string, tasks: any[]) {
 // Helper: load stats per user
 function loadStats(userId: string) {
   const filePath = getStatsFilePath(userId);
+  const isGuest = userId.includes("guest");
   if (!fs.existsSync(filePath)) {
-    const initialStats = {
+    const initialStats = isGuest ? {
       total_xp: 350,
       completed_tasks_count: 5,
       critical_tasks_resolved: 2,
       streak_days: 4,
+    } : {
+      total_xp: 0,
+      completed_tasks_count: 0,
+      critical_tasks_resolved: 0,
+      streak_days: 0,
     };
     fs.writeFileSync(filePath, JSON.stringify(initialStats, null, 2));
     return initialStats;
@@ -159,7 +172,7 @@ function loadStats(userId: string) {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
   } catch {
-    return { total_xp: 350, completed_tasks_count: 5, critical_tasks_resolved: 2, streak_days: 4 };
+    return isGuest ? { total_xp: 350, completed_tasks_count: 5, critical_tasks_resolved: 2, streak_days: 4 } : { total_xp: 0, completed_tasks_count: 0, critical_tasks_resolved: 0, streak_days: 0 };
   }
 }
 

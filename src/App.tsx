@@ -90,10 +90,10 @@ export default function App() {
   // Application states
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stats, setStats] = useState<UserStats>({
-    total_xp: 350,
-    completed_tasks_count: 5,
-    critical_tasks_resolved: 2,
-    streak_days: 4
+    total_xp: 0,
+    completed_tasks_count: 0,
+    critical_tasks_resolved: 0,
+    streak_days: 0
   });
 
   // Loading/Action indicators
@@ -268,8 +268,9 @@ export default function App() {
         loadedTasks.push({ id: docSnap.id, ...docSnap.data() } as Task);
       });
 
-      // Seed default assignments if Firestore collection is completely blank
-      if (loadedTasks.length === 0) {
+      // Seed default assignments if Firestore collection is completely blank and user is a guest
+      const isGuestUser = user.uid === "mock-evaluator-guest-123" || (user.email && user.email.toLowerCase().includes("guest"));
+      if (loadedTasks.length === 0 && isGuestUser) {
         const initialTasks = [
           {
             task_name: "Submit CS201 Final Java Project & Documentation",
@@ -341,11 +342,17 @@ export default function App() {
       if (snap.exists()) {
         setStats(snap.data() as UserStats);
       } else {
-        const initialStats = {
+        const isGuestUser = user.uid === "mock-evaluator-guest-123" || (user.email && user.email.toLowerCase().includes("guest"));
+        const initialStats = isGuestUser ? {
           total_xp: 350,
           completed_tasks_count: 5,
           critical_tasks_resolved: 2,
           streak_days: 4
+        } : {
+          total_xp: 0,
+          completed_tasks_count: 0,
+          critical_tasks_resolved: 0,
+          streak_days: 0
         };
         await setDoc(statsDocRef, initialStats);
         setStats(initialStats);
